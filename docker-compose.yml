@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+
+  ccc:
+    image: ccc
+    container_name: ccc
+    build: .
+    restart: unless-stopped
+    volumes:
+      - ./gui.py:/app/gui.py
+      - ./.streamlit/config.toml:/app/.streamlit/config.toml
+      - ./climatechambercontroller.py:/app/climatechambercontroller.py
+      - ./ccc.conf:/app/ccc.conf
+      - ./programs.conf:/app/programs.conf
+      - ./lock:/app/lock
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.ccc.rule=Host(`${HOST}`) && PathPrefix(`/ccc`) 
+      - traefik.http.routers.ccc.entrypoints=websecure
+      - traefik.http.routers.ccc.tls.certresolver=le
+      - traefik.http.services.ccc.loadbalancer.server.port=8501
+      - traefik.http.middlewares.stripccc.stripprefix.prefixes=/ccc
+      - traefik.http.middlewares.stripccc.stripprefix.forceSlash=true
+      - traefik.http.routers.ccc.middlewares=stripccc@docker,allowed-ips@docker,auth@docker
+      - traefik.http.routers.ccc.service=ccc@docker
+    networks:
+      - reverse-proxy
+
+networks:
+  reverse-proxy:
+    external: true
