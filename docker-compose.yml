@@ -9,7 +9,6 @@ services:
     restart: unless-stopped
     volumes:
       - ./gui.py:/app/gui.py
-      - ./.streamlit/config.toml:/app/.streamlit/config.toml
       - ./climatechambercontroller.py:/app/climatechambercontroller.py
       - ./ccc.conf:/app/ccc.conf
       - ./programs.conf:/app/programs.conf
